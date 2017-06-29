@@ -5,6 +5,20 @@
 /[Bb]uilds/
 /Assets/AssetStoreTools*
 
+/Assets/Allosaurus*
+/Assets/DragonBoar*
+/Assets/DungeonCharacters*
+/Assets/Reaktion*
+/Assets/Small Cave Kit*
+/Assets/Standard Assets*
+/Assets/Toon_RTS_demo*
+/Assets/Reaktion*
+/Assets/UniteInTheSky*
+/Assets/UnityChan*
+/Assets/UnityChanStage*
+/Assets/WaitingRoom*
+/Assets/WebPlayerTemplates*
+
 # Visual Studio 2015 cache directory
 /.vs/
 

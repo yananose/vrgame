@@ -10,8 +10,10 @@ namespace Vrgame
 {
     using System;
     using System.Collections.Generic;
+    using Omochaya.Audio;
     using Omochaya.Common;
     using Omochaya.Debug;
+    using Omochaya.Vr;
     using UnityEngine;
 
     /// <summary>
@@ -23,17 +25,22 @@ namespace Vrgame
         [SerializeField]
         private List<GameObject> monsters = null;
 
+        /// <summary>The person.</summary>
+        [SerializeField]
+        private Person person = null;
+
+        /// <summary>The knight.</summary>
+        [SerializeField]
+        private Knight knight = null;
+
         /// <summary>The monster no.</summary>
         private int monsterNo = 0;
 
         /// <summary>The scenario.</summary>
-        private static Scenario scenario = null;
+        private Scenario scenario = null;
 
-        /// <summary>Gets the is usable gyro.</summary>
-        public static bool IsUsableGyro { get; set; }
-
-        /// <summary>Gets the gyro.</summary>
-        public static Vector3 Gyro { get { return Game.IsUsableGyro ? Input.gyro.rotationRate : Vector3.zero; } }
+        /// <summary>The voice command.</summary>
+        private VoiceCommand voiceCommand = null;
 
         /// <summary>The awake.</summary>
         private void Awake()
@@ -45,8 +52,10 @@ namespace Vrgame
             Screen.autorotateToLandscapeRight = true;
             Screen.orientation = ScreenOrientation.AutoRotation;
 
+            // スリープオフ
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
+            // サンプルモデル
             monsterNo = Math.Max(monsterNo, 0);
             monsterNo = Math.Min(monsterNo, monsters.Count - 1);
             for (var i=0; i < monsters.Count ; i++)
@@ -64,46 +73,50 @@ namespace Vrgame
         /// <summary>The start.</summary>
         private void Start()
         {
-            if (Game.scenario == null)
-            {
-                Game.scenario = new Scenario(Scenario());
-            }
+            this.scenario = new Scenario(Scenario());
         }
 
         /// <summary>The update.</summary>
         private void Update()
         {
-            Game.scenario.Update();
+            this.scenario.Update();
         }
 
         /// <summary>The scenario.</summary>
         private IEnumerator<Func<bool>> Scenario()
         {
-            yield return null;
+            // ボイスコマンド開始待ち
+            this.voiceCommand = this.gameObject.AddComponent<VoiceCommand>();
+            yield return this.voiceCommand.IsStart;
 
-            // ジャイロ有効？
-            Input.gyro.enabled = true;
-            Game.IsUsableGyro = Input.gyro.enabled;
-
+            // メインループ
             while (true)
             {
-                // 画面タップで次
-                if (Input.GetMouseButtonUp(0))
+                // 開始待ち
+                this.person.IsEnable = false;
+                while (!this.person.IsEnable)
                 {
-                    monsters[monsterNo].SetActive(false);
-                    monsterNo++;
-                    monsterNo %= monsters.Count;
-                    monsters[monsterNo].SetActive(true);
+                    this.person.IsEnable = this.voiceCommand.IsHit(4) && this.person.IsStable;
+                    Debug.Log(""+ this.voiceCommand.IsHit(4));
+                    yield return null;
                 }
 
-                yield return null;
+                // メイン
+                while (!Input.GetMouseButtonUp(0))
+                {
+                    if (this.voiceCommand.IsHit(4))
+                    {
+                        this.knight.Attack();
+                    }
+                    yield return null;
+                }
+
+                // 次の画面
+                monsters[monsterNo].SetActive(false);
+                monsterNo++;
+                monsterNo %= monsters.Count;
+                monsters[monsterNo].SetActive(true);
             }
-
-            Resources.UnloadUnusedAssets();
-            yield return null;
-
-            DebugLog.Put("アプリ終了");
-            Application.Quit();
         }
     }
 }
