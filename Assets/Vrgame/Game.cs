@@ -92,23 +92,27 @@ namespace Vrgame
             // メインループ
             while (true)
             {
+                yield return null;
+                var skip = Input.GetMouseButtonUp(0);
                 // 開始待ち
                 this.person.IsEnable = false;
-                while (!this.person.IsEnable)
+                while (!this.person.IsEnable && !skip)
                 {
                     this.person.IsEnable = this.voiceCommand.IsHit(4) && this.person.IsStable;
-                    Debug.Log(""+ this.voiceCommand.IsHit(4));
+                    //Debug.Log(""+ this.voiceCommand.IsHit(4));
                     yield return null;
+                    skip = Input.GetMouseButtonUp(0);
                 }
 
                 // メイン
-                while (!Input.GetMouseButtonUp(0))
+                while (!skip)
                 {
                     if (this.voiceCommand.IsHit(4))
                     {
                         this.knight.Attack();
                     }
                     yield return null;
+                    skip = Input.GetMouseButtonUp(0);
                 }
 
                 // 次の画面
