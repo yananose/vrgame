@@ -107,7 +107,7 @@ namespace Vrgame
                 // メイン
                 while (!skip)
                 {
-                    if (this.voiceCommand.IsHit(4))
+                    if (this.knight != null && this.voiceCommand.IsHit(4))
                     {
                         this.knight.Attack();
                     }
