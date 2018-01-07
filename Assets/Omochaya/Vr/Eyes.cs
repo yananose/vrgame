@@ -6,7 +6,7 @@
 //   The eyes.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace Omochaya.Vr.person
+namespace Omochaya.Vr
 {
     using UnityEngine;
     using Omochaya.Common;
@@ -27,11 +27,6 @@ namespace Omochaya.Vr.person
 
         /// <summary>Gets the right.</summary>
         public Camera Right { get { return right; } }
-
-        /// <summary>The awake.</summary>
-        private void Awake()
-        {
-        }
 
         /// <summary>The start.</summary>
         private void Start()

@@ -16,9 +16,6 @@ namespace Vrgame
     /// </summary>
     public class Knight : Part<Animator>
     {
-        /// <summary>The monster no.</summary>
-        private int monsterNo = 0;
-
         /// <summary>Gets the component.</summary>
         public Animator Animator { get { return this.Component0; } }
 

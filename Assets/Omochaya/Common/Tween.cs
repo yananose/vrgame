@@ -248,7 +248,7 @@ namespace Omochaya.Common
                 progress = -progress;
             }
 
-            this.ExecuteCallback(progress * this.add, this.action);
+            this.ExecuteCallback(progress, this.action);
             return this.callback != null;
         }
 
@@ -362,7 +362,7 @@ namespace Omochaya.Common
         /// <summary>The execute next.</summary>
         private void ExecuteNext(float over, float length, Action<float> action)
         {
-            if (-length < over && over < length)
+            if (over < length)
             {
                 this.progress = over / length;
                 this.action = action;
@@ -375,7 +375,7 @@ namespace Omochaya.Common
             }
             else
             {
-                over -= 0 < over ? length : -length;
+                over -= length;
                 this.ExecuteCallback(over, action);
             }
         }
@@ -394,7 +394,7 @@ namespace Omochaya.Common
                 if (++no < this.callbacks.Count)
                 {
                     this.callbackNo = no;
-                    this.callbacks[no](over);
+                    this.callbacks[no](over / this.add);
                     return;
                 }
             }
@@ -409,7 +409,7 @@ namespace Omochaya.Common
                 if (0 <= --no)
                 {
                     this.callbackNo = no;
-                    this.callbacks[no](over);
+                    this.callbacks[no](over / -this.add);
                     return;
                 }
             }

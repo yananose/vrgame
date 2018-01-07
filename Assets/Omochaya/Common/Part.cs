@@ -43,7 +43,7 @@ namespace Omochaya.Common
 
             // Hierarchy 上に配置していればそれを使う
             var ret = this.GetComponentInChildren<T>(true);
-            if(ret == null)
+            if(!ret)
             {
                 // なければ GameObject ごと作成
                 var child = new GameObject(type.Name, type);
@@ -58,7 +58,7 @@ namespace Omochaya.Common
         //public System.Collections.IEnumerator Get<S>()
         //{
         //    var ret = this.GetComponent<S>();
-        //    if (ret == null)
+        //    if (!ret)
         //    {
         //        ret = this.GetComponentInChildren<S>(true);
         //    }

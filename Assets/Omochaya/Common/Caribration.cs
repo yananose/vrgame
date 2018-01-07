@@ -29,19 +29,26 @@ namespace Omochaya.Common
         /// <summary>The is pass.</summary>
         public bool IsPass { get { return this.score.IsPass; } }
 
+        /// <summary>Gets the score.</summary>
+        public float Score { get { return this.score != null ? this.score.Point : 0f; } }
+
+        /// <summary>The set max.</summary>
+        public void SetMax() { this.score.SetMax(); }
+
         /// <summary>The constructor.</summary>
-        public Caribration(float passLine, int time, float sensitivity)
+        public Caribration(float passLine, float need, float stable, float sensitivity)
         {
-            this.score = new Score(passLine, time);
+            this.cand = Vector3.zero;
+            this.score = new Score(passLine, need, stable);
             this.sensitivity = Mathf.Max(0.001f, sensitivity);
         }
 
         /// <summary>The update.</summary>
         public void Update(Vector3 value)
         {
-            this.cand = Vector3.LerpUnclamped(this.cand, value, this.sensitivity);
             var diff = Vector3.Distance(this.Value, value);
             var diffCand = Vector3.Distance(this.cand, value);
+            this.cand = Vector3.LerpUnclamped(this.cand, value, this.sensitivity);
             if (this.score.Update(diff, diffCand))
             {
                 this.Value = this.cand;

@@ -69,7 +69,7 @@ namespace Omochaya.Ui
         protected Tween tween = new Tween();
 
         /// <summary>Gets the is open any.</summary>
-        public static bool IsOpenAny { get { return Popup.Current != null; } }
+        public static bool IsOpenAny { get { return Popup.Current; } }
 
         /// <summary>Gets the is open.</summary>
         public bool IsOpen { get { return this.Enable && !this.tween.IsReverse; } }
@@ -80,7 +80,7 @@ namespace Omochaya.Ui
         /// <summary>The enable button.</summary>
         public static void EnableButton(Button button, bool isEnable)
         {
-            if (button != null && button.interactable != isEnable)
+            if (button && button.interactable != isEnable)
             {
                 button.interactable = isEnable;
                 var color = isEnable ? Popup.EnabledTextColor : Popup.DisabledTextColor;
@@ -150,7 +150,7 @@ namespace Omochaya.Ui
             {
                 this.requestSeOpen = false;
                 this.ChangeCurrent(true);
-                if (AudioPlayer.Current != null && this.seOpen != null && (AudioPlayer.Current.LastTime + 0.05f) < Time.realtimeSinceStartup)
+                if (AudioPlayer.Current && this.seOpen && (AudioPlayer.Current.LastTime + 0.05f) < Time.realtimeSinceStartup)
                 {
                     AudioPlayer.Current.PlaySe(this.seOpen, 0.5f);
                 }
@@ -190,7 +190,7 @@ namespace Omochaya.Ui
             this.first = null;
             this.selectables = new List<Selectable>();
             var selectedPosition = new Vector2(2048f, -2048f);
-            var back = this.back == null ? null : this.back.gameObject;
+            var back = !this.back ? null : this.back.gameObject;
             foreach (var item in this.GetComponentsInChildren<Selectable>(false))
             {
                 if (item.gameObject != back)
@@ -198,7 +198,7 @@ namespace Omochaya.Ui
                     this.selectables.Add(item);
                     var rectTransform = item.transform as RectTransform;
                     var itemPosition = (Vector2)rectTransform.position;
-                    if (this.first == null ||
+                    if (!this.first ||
                         selectedPosition.y < itemPosition.y ||
                         (itemPosition.y == selectedPosition.y && itemPosition.x < selectedPosition.x))
                     {
@@ -209,7 +209,7 @@ namespace Omochaya.Ui
             }
 
             this.selected = this.first;
-            if (this.selected != null && Joypad.Current.IsEnabled)
+            if (this.selected && Joypad.Current.IsEnabled)
             {
                 EventSystem.current.SetSelectedGameObject(this.selected.gameObject);
             }
@@ -218,7 +218,7 @@ namespace Omochaya.Ui
         /// <summary>The input key.</summary>
         protected void InputKey(Vector2 direction, bool isDecide, bool isCancel)
         {
-            if (this.selected == null || Popup.Current != this)
+            if (!this.selected || Popup.Current != this)
             {
                 return;
             }
@@ -248,7 +248,7 @@ namespace Omochaya.Ui
                     this.inputed = true;
                     this.selected = cand;
                     EventSystem.current.SetSelectedGameObject(this.selected.gameObject);
-                    if (AudioPlayer.Current != null && this.seSelect != null)
+                    if (AudioPlayer.Current && this.seSelect)
                     {
                         AudioPlayer.Current.PlaySe(this.seSelect, 0.5f);
                     }
@@ -260,7 +260,7 @@ namespace Omochaya.Ui
             {
                 this.inputed = false;
                 var slider = cand as Slider;
-                if (slider != null)
+                if (slider)
                 {
                     var add = 0f;
                     switch (slider.direction)
@@ -283,12 +283,12 @@ namespace Omochaya.Ui
                 }
             }
 
-            if (this.selected != null)
+            if (this.selected)
             {
                 if (isDecide)
                 {
                     var button = this.selected.GetComponent<Button>();
-                    if (button != null)
+                    if (button)
                     {
                         button.onClick.Invoke();
                     }
@@ -298,7 +298,7 @@ namespace Omochaya.Ui
             if (isCancel)
             {
                 var back = this.back.GetComponent<Button>();
-                if (back != null)
+                if (back)
                 {
                     back.onClick.Invoke();
                 }
@@ -315,7 +315,7 @@ namespace Omochaya.Ui
                 this.selected = this.selectables.Contains(selected) ? selected : this.first;
                 this.previous = Popup.Current;
                 Popup.Current = this;
-                if (this.selected != null && Joypad.Current.IsEnabled)
+                if (this.selected && Joypad.Current.IsEnabled)
                 {
                     EventSystem.current.SetSelectedGameObject(this.selected.gameObject);
                 }
@@ -324,7 +324,7 @@ namespace Omochaya.Ui
             {
                 Popup.Current = this.previous;
                 this.previous = null;
-                if (Popup.Current != null && Popup.Current.selected != null && Joypad.Current.IsEnabled)
+                if (Popup.Current != null && Popup.Current.selected && Joypad.Current.IsEnabled)
                 {
                     EventSystem.current.SetSelectedGameObject(Popup.Current.selected.gameObject);
                 }
@@ -334,7 +334,7 @@ namespace Omochaya.Ui
         /// <summary>The initialize.</summary>
         private void Initialize()
         {
-            if (this.back == null)
+            if (!this.back)
             {
                 var gameObject = new GameObject("back", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
                 var transform = gameObject.transform as RectTransform;
@@ -351,7 +351,7 @@ namespace Omochaya.Ui
                 var button = gameObject.GetComponent<Button>();
                 button.transition = Selectable.Transition.None;
                 button.onClick.AddListener(this.Close);
-                if (AudioPlayer.Current != null && this.seCancel != null)
+                if (AudioPlayer.Current && this.seCancel)
                 {
                     button.onClick.AddListener(this.PlaySeCancel);
                 }

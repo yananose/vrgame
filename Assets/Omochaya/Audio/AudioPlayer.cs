@@ -85,7 +85,7 @@ namespace Omochaya.Audio
                 this.Bgm = null;
             }
 
-            if (source != null)
+            if (source)
             {
                 this.stop(source, time);
             }
@@ -108,7 +108,7 @@ namespace Omochaya.Audio
         /// <summary>The play voice.</summary>
         public AudioSource PlayVoice(AudioClip clip, float volume = 1f, float delay = 0f)
         {
-            if (this.Voice == null || !this.Voice.isPlaying)
+            if (!this.Voice || !this.Voice.isPlaying)
             {
                 this.Voice = this.play(clip, AudioPlayer.IsMuteVoice ? 0f : volume * AudioPlayer.VolumeVoice, false, delay);
             }
@@ -125,7 +125,7 @@ namespace Omochaya.Audio
                 this.Voice = null;
             }
 
-            if (source != null)
+            if (source)
             {
                 this.stop(source, time);
             }
@@ -143,7 +143,7 @@ namespace Omochaya.Audio
                 }
             }
             
-            if(ret == null)
+            if(!ret)
             {
                 ret = this.gameObject.AddComponent<AudioSource>();
                 this.sources.Add(ret);
@@ -195,7 +195,7 @@ namespace Omochaya.Audio
                         0,
                         rate =>
                         {
-                            if (source != null && source.isPlaying)
+                            if (source && source.isPlaying)
                             {
                                 source.volume = rate;
                             }
@@ -206,7 +206,7 @@ namespace Omochaya.Audio
                         },
                         () =>
                         {
-                            if (source != null)
+                            if (source)
                             {
                                 source.Stop();
                             }

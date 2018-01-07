@@ -98,7 +98,7 @@ namespace Vrgame
                 this.person.IsEnable = false;
                 while (!this.person.IsEnable && !skip)
                 {
-                    this.person.IsEnable = this.voiceCommand.IsHit(4) && this.person.IsStable;
+                    this.person.IsEnable = !string.IsNullOrEmpty(this.voiceCommand.Moji) && this.person.IsStable;
                     //Debug.Log(""+ this.voiceCommand.IsHit(4));
                     yield return null;
                     skip = Input.GetMouseButtonUp(0);
@@ -107,7 +107,7 @@ namespace Vrgame
                 // メイン
                 while (!skip)
                 {
-                    if (this.knight != null && this.voiceCommand.IsHit(4))
+                    if (this.knight != null && !string.IsNullOrEmpty(this.voiceCommand.Moji))
                     {
                         this.knight.Attack();
                     }

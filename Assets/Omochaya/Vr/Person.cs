@@ -13,7 +13,6 @@ namespace Omochaya.Vr
     using UnityEngine;
     using Omochaya.Common;
     using Omochaya.Debug;
-    using Omochaya.Vr.person;
 
     /// <summary>The pause.</summary>
     public class Person : Part<Transform>
@@ -22,23 +21,11 @@ namespace Omochaya.Vr
         [SerializeField]
         private Transform neck = null;
 
-        /// <summary>The eyes.</summary>
-        [SerializeField]
-        private Eyes eyes = null;
-
-        /// <summary>The caribration node.</summary>
-        [SerializeField]
-        private GameObject caribrationNode = null;
-
-        /// <summary>The start node.</summary>
-        [SerializeField]
-        private GameObject startNode = null;
-
         /// <summary>The scenario.</summary>
         private Scenario scenario = null;
 
         /// <summary>The rotation.</summary>
-        private Quaternion rotation;
+        private Quaternion rotation = Quaternion.identity;
 
         /// <summary>The gyro caribration.</summary>
         private Caribration gyroCaribration;
@@ -61,8 +48,19 @@ namespace Omochaya.Vr
         /// <summary>Gets the neck.</summary>
         public Transform Neck { get { return neck; } }
 
-        /// <summary>Gets the eyes.</summary>
-        public Eyes Eyes { get { return eyes; } }
+        /// <summary>Gets the caribration score.</summary>
+        public float CaribrationScore
+        {
+            get
+            {
+                if (this.gyroCaribration == null || this.gravityCaribration == null)
+                {
+                    return 0f;
+                }
+
+                return Math.Min(this.gyroCaribration.Score, this.gravityCaribration.Score);
+            }
+        }
 
         /// <summary>The start.</summary>
         private void Start()
@@ -71,9 +69,6 @@ namespace Omochaya.Vr
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 60;
             this.SetDeltaTime(1f / Application.targetFrameRate);
-
-            this.caribrationNode.SetActive(true);
-            this.startNode.SetActive(false);
             this.scenario = new Scenario(Scenario());
         }
 
@@ -82,7 +77,14 @@ namespace Omochaya.Vr
         {
             if (Input.gyro.enabled)
             {
-                neck.transform.localRotation = this.rotation;
+                var bodyAngles = this.transform.localEulerAngles;
+                var neckAngles = neck.transform.localEulerAngles;
+                var angles = this.rotation.eulerAngles;
+                neckAngles.x = angles.x;
+                bodyAngles.y = angles.y;
+                neckAngles.z = angles.z;
+                this.transform.localEulerAngles = bodyAngles;
+                neck.transform.localEulerAngles = neckAngles;
             }
             else
             {
@@ -109,20 +111,23 @@ namespace Omochaya.Vr
                 // 初期化
                 this.IsStable = false;
                 this.IsEnable = false;
-                this.gyroCaribration = new Caribration(0.01f, 10, 1f / 8f);
-                this.gravityCaribration = new Caribration(0.01f, 10, 1f / 8f);
+                this.gyroCaribration = new Caribration(0.0115f, 0.6f, 2f, 1f / 4f);
+                this.gravityCaribration = new Caribration(0.008f, 0.6f, 0f, 1f / 4f);
                 this.rotation.eulerAngles = Vector3.zero;
 
                 // 開始待ち
                 while (!this.IsEnable)
                 {
-                    this.gyroCaribration.Update(Input.gyro.rotationRateUnbiased);
-                    this.gravityCaribration.Update(Input.gyro.gravity.normalized);
-                    var flag = this.gyroCaribration.IsPass && this.gravityCaribration.IsPass;
-                    this.IsStable = flag;
-                    this.caribrationNode.SetActive(!flag);
-                    this.startNode.SetActive(flag);
                     yield return null;
+                    this.gyroCaribration.Update(Input.gyro.rotationRate);
+                    this.gravityCaribration.Update(Input.gyro.gravity.normalized);
+                    var old = this.IsStable;
+                    this.IsStable = this.gyroCaribration.IsPass && this.gravityCaribration.IsPass;
+                    if (!old && this.IsStable)
+                    {
+                        this.gyroCaribration.SetMax();
+                        this.gravityCaribration.SetMax();
+                    }
                 }
 
                 {
@@ -131,9 +136,6 @@ namespace Omochaya.Vr
                     this.gravityCaribrationZ = Mathf.Atan2(-g.x, -g.y);
                     this.gravityCaribrationX = Mathf.Atan2(-g.z, xy);
                 }
-
-                this.caribrationNode.SetActive(false);
-                this.startNode.SetActive(false);
 
                 // メイン
                 yield return this.UpdateNeck;
@@ -145,7 +147,7 @@ namespace Omochaya.Vr
         {
             // ジャイロで回転
             var angles = this.rotation.eulerAngles;
-            var gyro = Input.gyro.rotationRateUnbiased - this.gyroCaribration.Value;
+            var gyro = Input.gyro.rotationRate - this.gyroCaribration.Value;
             var rad = angles.z * Mathf.Deg2Rad;
             var sin = Mathf.Sin(rad);
             var cos = Mathf.Cos(rad);
