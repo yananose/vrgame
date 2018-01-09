@@ -1,10 +1,15 @@
 fileFormatVersion: 2
 guid: eed0cc34ee7bf0e40b17dbd1ed07c103
-timeCreated: 1470557811
+timeCreated: 1515484261
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - window: {instanceID: 0}
+  - seOpen: {instanceID: 0}
+  - seCancel: {instanceID: 0}
+  - seSelect: {instanceID: 0}
+  - materialVrUi: {fileID: 2100000, guid: 11b8b85c2e049da4c85fb387264376dc, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

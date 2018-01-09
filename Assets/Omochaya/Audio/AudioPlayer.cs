@@ -23,7 +23,7 @@ namespace Omochaya.Audio
         private List<Tween> fadeouts = new List<Tween>();
 
         /// <summary>The current.</summary>
-        public static AudioPlayer Current { get; set; }
+        public static AudioPlayer Ins { get; set; }
 
         /// <summary>The volume bgm.</summary>
         public static float VolumeBgm { get; set; }

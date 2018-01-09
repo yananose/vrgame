@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace Omochaya.Ui
 {
+    using System;
     using UnityEngine;
     using UnityEngine.UI;
     using Omochaya.Common;
@@ -18,13 +19,29 @@ namespace Omochaya.Ui
         /// <summary>Gets the text.</summary>
         private Text Text { get { return this.Component0; } }
 
+        /// <summary>The callback.</summary>
+        private Action callback = null;
+
+        /// <summary>The on.</summary>
+        public void On(Action callback)
+        {
+            this.callback = callback;
+            this.Enable = true;
+        }
+
         /// <summary>The update.</summary>
         private void Update()
         {
             var time = (int)(Time.realtimeSinceStartup * 1000);
             this.Text.gameObject.SetActive((time & 0x300) != 0);
-            if (Joypad.Current.IsTouching)
+            if (Joypad.Ins.IsTouching)
             {
+                if (this.callback != null)
+                {
+                    this.callback();
+                }
+
+                this.Enable = false;
             }
         }
     }

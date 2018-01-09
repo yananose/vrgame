@@ -33,7 +33,7 @@ namespace Omochaya.Debug
         public static void Pause()
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPaused = true;
+            UnityEditor.EditorApplication.isPaused = !UnityEditor.EditorApplication.isPaused;
 #endif
         }
 #else

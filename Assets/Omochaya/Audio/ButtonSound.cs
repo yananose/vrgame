@@ -43,11 +43,11 @@ namespace Omochaya.Audio
         {
             if (this.isVoice)
             {
-                AudioPlayer.Current.PlayVoice(this.audioClip);
+                AudioPlayer.Ins.PlayVoice(this.audioClip);
             }
             else
             {
-                AudioPlayer.Current.PlaySe(this.audioClip, 0.5f);
+                AudioPlayer.Ins.PlaySe(this.audioClip, 0.5f);
             }
         }
     }

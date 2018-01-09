@@ -26,7 +26,7 @@ namespace Omochaya.Ui
         public static readonly Color EnabledTextColor = new Color(0.2f, 0.2f, 0.2f);
 
         /// <summary>The current.</summary>
-        private static Popup Current = null;
+        private static Popup Ins = null;
 
         /// <summary>The window.</summary>
         [SerializeField]
@@ -43,6 +43,14 @@ namespace Omochaya.Ui
         /// <summary>The se select.</summary>
         [SerializeField]
         protected AudioClip seSelect = null;
+
+        /// <summary>The material vr ui.</summary>
+        [SerializeField]
+        protected Material materialVrUi = null;
+
+        /// <summary>The mask.</summary>
+        [SerializeField]
+        protected Mask mask = null;
 
         /// <summary>The request se open.</summary>
         private bool requestSeOpen = false;
@@ -69,7 +77,7 @@ namespace Omochaya.Ui
         protected Tween tween = new Tween();
 
         /// <summary>Gets the is open any.</summary>
-        public static bool IsOpenAny { get { return Popup.Current; } }
+        public static bool IsOpenAny { get { return Popup.Ins; } }
 
         /// <summary>Gets the is open.</summary>
         public bool IsOpen { get { return this.Enable && !this.tween.IsReverse; } }
@@ -140,7 +148,7 @@ namespace Omochaya.Ui
             }
 
             this.tween.Start(time, this.ChangeTween, null, easeType, 2);
-//            Game.Ui.Mask.Get.On();
+            this.mask.On();
         }
 
         /// <summary>The start tween.</summary>
@@ -150,9 +158,9 @@ namespace Omochaya.Ui
             {
                 this.requestSeOpen = false;
                 this.ChangeCurrent(true);
-                if (AudioPlayer.Current && this.seOpen && (AudioPlayer.Current.LastTime + 0.05f) < Time.realtimeSinceStartup)
+                if (AudioPlayer.Ins && this.seOpen && (AudioPlayer.Ins.LastTime + 0.05f) < Time.realtimeSinceStartup)
                 {
-                    AudioPlayer.Current.PlaySe(this.seOpen, 0.5f);
+                    AudioPlayer.Ins.PlaySe(this.seOpen, 0.5f);
                 }
             }
 
@@ -165,7 +173,7 @@ namespace Omochaya.Ui
                 }
                 else
                 {
-//                    Game.Ui.Mask.Get.Off();
+                    this.mask.Off();
                     if (this.tween.IsReverse)
                     {
                         ret = true;
@@ -176,9 +184,9 @@ namespace Omochaya.Ui
             }
 
             // 操作
-            if (!ret && Joypad.Current.IsEnabled)
+            if (!ret && Joypad.Ins.IsEnabled)
             {
-                this.InputKey(Joypad.Current.Direction, Joypad.Current.onShot, Joypad.Current.onMenu);
+                this.InputKey(Joypad.Ins.Direction, Joypad.Ins.onShot, Joypad.Ins.onMenu);
             }
 
             return ret;
@@ -190,7 +198,7 @@ namespace Omochaya.Ui
             this.first = null;
             this.selectables = new List<Selectable>();
             var selectedPosition = new Vector2(2048f, -2048f);
-            var back = !this.back ? null : this.back.gameObject;
+            var back = this.back ? this.back.gameObject : null;
             foreach (var item in this.GetComponentsInChildren<Selectable>(false))
             {
                 if (item.gameObject != back)
@@ -209,7 +217,7 @@ namespace Omochaya.Ui
             }
 
             this.selected = this.first;
-            if (this.selected && Joypad.Current.IsEnabled)
+            if (this.selected && Joypad.Ins.IsEnabled)
             {
                 EventSystem.current.SetSelectedGameObject(this.selected.gameObject);
             }
@@ -218,7 +226,7 @@ namespace Omochaya.Ui
         /// <summary>The input key.</summary>
         protected void InputKey(Vector2 direction, bool isDecide, bool isCancel)
         {
-            if (!this.selected || Popup.Current != this)
+            if (!this.selected || Popup.Ins != this)
             {
                 return;
             }
@@ -248,9 +256,9 @@ namespace Omochaya.Ui
                     this.inputed = true;
                     this.selected = cand;
                     EventSystem.current.SetSelectedGameObject(this.selected.gameObject);
-                    if (AudioPlayer.Current && this.seSelect)
+                    if (AudioPlayer.Ins && this.seSelect)
                     {
-                        AudioPlayer.Current.PlaySe(this.seSelect, 0.5f);
+                        AudioPlayer.Ins.PlaySe(this.seSelect, 0.5f);
                     }
 
                     DebugLog.Put(cand.name + "(" + maxScore + ")");
@@ -313,20 +321,20 @@ namespace Omochaya.Ui
                 var selected = this.selected;
                 this.SetupSelectable();
                 this.selected = this.selectables.Contains(selected) ? selected : this.first;
-                this.previous = Popup.Current;
-                Popup.Current = this;
-                if (this.selected && Joypad.Current.IsEnabled)
+                this.previous = Popup.Ins;
+                Popup.Ins = this;
+                if (this.selected && Joypad.Ins.IsEnabled)
                 {
                     EventSystem.current.SetSelectedGameObject(this.selected.gameObject);
                 }
             }
-            else if (Popup.Current == this)
+            else if (Popup.Ins == this)
             {
-                Popup.Current = this.previous;
+                Popup.Ins = this.previous;
                 this.previous = null;
-                if (Popup.Current != null && Popup.Current.selected && Joypad.Current.IsEnabled)
+                if (Popup.Ins && Popup.Ins.selected && Joypad.Ins.IsEnabled)
                 {
-                    EventSystem.current.SetSelectedGameObject(Popup.Current.selected.gameObject);
+                    EventSystem.current.SetSelectedGameObject(Popup.Ins.selected.gameObject);
                 }
             }
         }
@@ -347,11 +355,11 @@ namespace Omochaya.Ui
                 transform.pivot = Vector2.one * 0.5f;
                 this.back = gameObject.GetComponent<Image>();
                 this.back.color = Color.black;
-                this.back.material = null;// Game.MaterialVrUi;
+                this.back.material = this.materialVrUi;
                 var button = gameObject.GetComponent<Button>();
                 button.transition = Selectable.Transition.None;
                 button.onClick.AddListener(this.Close);
-                if (AudioPlayer.Current && this.seCancel)
+                if (AudioPlayer.Ins && this.seCancel)
                 {
                     button.onClick.AddListener(this.PlaySeCancel);
                 }
@@ -375,7 +383,7 @@ namespace Omochaya.Ui
         /// <summary>The play se cancel.</summary>
         private void PlaySeCancel()
         {
-            AudioPlayer.Current.PlaySe(this.seCancel, 0.5f);
+            AudioPlayer.Ins.PlaySe(this.seCancel, 0.5f);
         }
 
         /// <summary>The start.</summary>

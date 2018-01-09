@@ -17,7 +17,7 @@ namespace Omochaya.Common
     public class Joypad
     {
         /// <summary>The current.</summary>
-        public static Joypad Current { get; private set; }
+        public static Joypad Ins { get; private set; }
 
         /// <summary>The shot.</summary>
         private KeyCode shot = KeyCode.None;
@@ -37,7 +37,12 @@ namespace Omochaya.Common
         /// <summary>The constructor.</summary>
         static Joypad()
         {
-            Joypad.Current = new Joypad();
+            Joypad.Ins = new Joypad();
+        }
+
+        /// <summary>The constructor.</summary>
+        private Joypad()
+        {
         }
 
         /// <summary>The setpu.</summary>

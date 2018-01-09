@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 066f7eaa44b0c9c408d5e5f8acb4782b
+timeCreated: 1515383422
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - monitor: {fileID: 1995673610674176, guid: 17929785e1785a04b8ee7fcbc189d827, type: 2}
+  - marker: {fileID: 116474, guid: 712e124ddc3f6984e8ad1fa6dd317cbe, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
